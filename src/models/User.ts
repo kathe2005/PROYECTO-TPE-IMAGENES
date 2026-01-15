@@ -1,4 +1,4 @@
-import { Schema, model, Document} from 'mongoose';
+import { Schema, model} from 'mongoose';
 
 /**
  *  INTERFAZ DE USUARIO (IUser)
@@ -7,11 +7,10 @@ import { Schema, model, Document} from 'mongoose';
 
 export interface IUser
 {
-    id?: string; 
+    id: string; 
     email: string; 
     password: string; 
-    createdAt?: Date; 
-    updatedAt?: Date; 
+    createdAt: Date; 
 }
 
 /**
@@ -47,4 +46,5 @@ const userSchema = new Schema<IUser>(
 
 ); 
 
+//Creación del Modelo 
 export const User = model<IUser>('User', userSchema); 

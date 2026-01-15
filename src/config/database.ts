@@ -1,11 +1,12 @@
+//Importaciones 
 import mongoose from "mongoose";
 import dotenv from "dotenv"; 
 
-//Cargar variables de entorno 
+//Carga las variables del archivo .env para poder leerlas 
 dotenv.config(); 
-
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/PROYECTO-TPE-IMAGENES'; 
 
+//Funcion de la Conexion 
 export const connectDB = async () : Promise<void> => 
 {
     try{
@@ -17,7 +18,7 @@ export const connectDB = async () : Promise<void> =>
     catch (error)
     {
         console.error('❌ Error de Conexión:', error); 
-        process.exit(1);  //Detener si no hay base de datos 
+        process.exit(1);  
     }
     
 }

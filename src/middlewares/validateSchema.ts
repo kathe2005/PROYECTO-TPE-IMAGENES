@@ -12,13 +12,13 @@ export const validateEmail = (req: Request, res: Response, next: NextFunction) =
 
     if ( !email ||  !emailRegex.test(email) )
     {
-        return res.status(400).json
-        (
-            {
-                success: false, 
-                message: "⚠️ Acceso restringido. Solo se permiten correos de Gmail, Hotmail, Outlook, Yahoo o institucionales UCAB."
-            }
-        ); 
+        return res.status(400).json({
+
+                error: "El formato de correo invalido",
+                code: "INVALID_EMAIL",
+                timestamp: new Date().toISOString()
+
+            }); 
     }
 
     next();  //Dominio autorizado

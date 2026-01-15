@@ -1,17 +1,14 @@
+import { IAuthService } from '../interfaces/IAuthService';
 import bcrypt from 'bcryptjs'; 
-import jwt from 'jsonwebtoken'; 
-
-//Interfaz IAuthService: El Manual de Procedimientos
-export interface IAuthService
-{
-    hashPassword(password: string): Promise<string>; 
-    comparePassword(password: string, hash: string): Promise<boolean>; 
-    generateToken(userId: string): string; 
-}
+import jwt from 'jsonwebtoken';
+import { ITokenPayload } from '../interfaces/ITokenPayload'; 
+import { AppError } from '../types/AppError';
 
 export class AuthService implements IAuthService
 {
     private readonly saltRounds = 10; 
+
+    //Clave Secreta
     private readonly jwtSecret = process.env.JWT_SECRET || 'secret_para_pruebas'; 
 
     //Hashear contraseña (Cifrado)
@@ -27,14 +24,39 @@ export class AuthService implements IAuthService
     }
 
 
-    //Generar Token JWT (Carnet de Identidad)
+    //Generar Token JWT (Carnet de Identidad - Pasaporte)
     generateToken(userId: string): string 
     {
-        return jwt.sign(
-            { sub: userId }, 
-            this.jwtSecret,
-            { expiresIn: '1h' } //El carnet vence en 1 hora 
-        ); 
+        //Header (Se crea la placa)  
+        const options: jwt.SignOptions = {
+            algorithm: 'HS256',
+            expiresIn: '1h'                 //Tiempo de existencia de la placa 
+        }
+
+        //Payload (Se graba los datos en la placa)  
+        const payload = {
+            sub: userId, 
+            role: 'ucabista'
+        }
+
+        //Signature (Se pone el sello final)  
+        return jwt.sign(payload, this.jwtSecret, options); 
+    }
+
+
+
+    //Vefificar el Token 
+    async verifyToken(token: string): Promise<ITokenPayload>
+    {
+        try{
+            
+            const decoded = jwt.verify(token, this.jwtSecret) as unknown as ITokenPayload; 
+            return decoded; 
+        }
+        catch (error)
+        {
+            throw new AppError('Token inválido o expirado', 'AUTH_TOKEN_EXPIRED', 401); 
+        }
     }
 
 }

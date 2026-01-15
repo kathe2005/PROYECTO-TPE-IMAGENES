@@ -1,25 +1,38 @@
-import { IImagenOperation } from "./IImageOperation";
+import { IImagenOperation} from "../interfaces/IImageOperation";
 import { ResizeOperation } from "./ResizeOperation";
 import { FilterOperation } from "./FilterOperation";
+import { RotateOperation } from "./RotateOperation";
+import { CropOperation } from "./CropOperation";
+import { FormatOperation } from "./FormatOperation";
+import { AppError } from "../types/AppError";
 
-export class OperationFactory 
-{
-    static getOperation(type: string): IImagenOperation 
-    {
-        const operationMap: { [key: string]: IImagenOperation } = {
-            'resize': new ResizeOperation(), 
-            'filter': new FilterOperation()
-        }; 
+export class OperationFactory{
 
-        const operation = operationMap [ type.toLowerCase() ]; 
+    //Mapa que combina un nombre con una clase de operacion 
+    private operations: Map<string, IImagenOperation> = new Map(); 
 
-        if ( !operation )
-        {
-            throw new Error (`🚫 Operación '${type}' no reconocida por el Cuartel WISE.`); 
-        }
+    constructor(){
 
-        return operation; 
+        //Las Operaciones a emplear a la imagen 
+        this.operations.set('resize', new ResizeOperation()); 
+        this.operations.set('filter', new FilterOperation());
+        this.operations.set('rotate', new RotateOperation()); 
+        this.operations.set('crop', new CropOperation()); 
+        this.operations.set('format', new FormatOperation()); 
     }
 
+    //Pide Operacion por el nombre 
+    getOperation(type: string): IImagenOperation
+    {
+        const op = this.operations.get(type); 
+
+        if(!op)
+        {
+            //Error si no se conoce la operacion
+            throw new AppError(`Operacion desconocida: ${type}`, "OPERATION_NOT_FOUND", 400); 
+        }
+
+        return op; 
+    }
 
 }
